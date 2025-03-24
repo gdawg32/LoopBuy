@@ -589,11 +589,14 @@ def filter_listings(request):
 def sort_listings(request):
     order = request.GET.get('order', '')
     listings = Listing.objects.filter(is_available=True)
-
     if order == 'price_low_high':
         listings = listings.order_by('price')
     elif order == 'price_high_low':
         listings = listings.order_by('-price')
+    elif order == 'newest':
+        listings = listings.order_by('-created_at') 
+    elif order == 'oldest':
+        listings = listings.order_by('created_at')  
 
     for listing in listings:
         if not listing.images:
@@ -608,7 +611,15 @@ def sort_listings(request):
 
 def category_search(request):
     categories = Category.choices  # Get the available categories
-    return render(request, 'category_search.html', {'categories': categories})
+
+    # Get the latest 3 listings
+    latest_listings = Listing.objects.filter(is_available=True).order_by('-created_at')[:3]
+
+    context = {
+        'categories': categories,
+        'latest_listings': latest_listings,
+    }
+    return render(request, 'category_search.html', context)
 
 def listings_view(request):
     """View for initial page load with base template and styling"""

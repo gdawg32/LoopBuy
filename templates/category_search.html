@@ -87,37 +87,55 @@
     </div>
 
     <!-- Featured Products Section -->
-    <div class="bg-gray-50 py-12">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-8 text-center">Featured Items</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Featured Product cards would be loaded dynamically from your database -->
-                {% for i in "1234" %}
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
-                    <div class="bg-gray-200 h-48"></div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">{{ "Mobile,Laptop,Vehicle,Other" }}</span>
-                            <span class="text-sm text-gray-500">3 days ago</span>
-                        </div>
-                        <h3 class="font-semibold text-lg mb-2">Item Title Goes Here</h3>
-                        <p class="text-gray-700 font-bold mb-2">$299.99</p>
-                        <div class="flex items-center mb-2">
-                            <div class="w-6 h-6 rounded-full bg-gray-300 mr-2"></div>
-                            <span class="text-sm text-gray-600">John Doe</span>
-                        </div>
-                        <a href="#" class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded transition duration-300">View Details</a>
-                    </div>
+<div class="bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-8 text-center">Featured Items</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for listing in latest_listings %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                <div class="h-48 bg-gray-200">
+                    {% if listing.images %}
+                        <img src="{{ listing.images.url }}" alt="{{ listing.title }}" class="w-full h-48 object-cover">
+                    {% else %}
+                        {% with listing.listing_images.first as fallback_img %}
+                            {% if fallback_img %}
+                                <img src="{{ fallback_img.image.url }}" alt="{{ listing.title }}" class="w-full h-48 object-cover">
+                            {% else %}
+                                <div class="flex items-center justify-center h-full text-gray-400">No Image</div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
                 </div>
-                {% endfor %}
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                            {{ listing.get_category_display }}
+                        </span>
+                        <span class="text-sm text-gray-500">{{ listing.created_at|timesince }} ago</span>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">{{ listing.title }}</h3>
+                    <p class="text-gray-700 font-bold mb-2">₹{{ listing.price }}</p>
+                    <div class="flex items-center mb-2">
+                        <div class="w-6 h-6 rounded-full bg-gray-300 mr-2"></div>
+                        <span class="text-sm text-gray-600">{{ listing.seller.username }}</span>
+                    </div>
+                    <a href="{% url 'listing_detail' listing.id %}" class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded transition duration-300">
+                        View Details
+                    </a>
+                </div>
             </div>
-            <div class="text-center mt-8">
-                <a href="/all_listings/" class="inline-block bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 font-semibold px-6 py-3 rounded-lg transition duration-300">
-                    View All Listings
-                </a>
-            </div>
+            {% empty %}
+            <p class="col-span-full text-center text-gray-500">No featured items available right now.</p>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-8">
+            <a href="/all_listings/" class="inline-block bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 font-semibold px-6 py-3 rounded-lg transition duration-300">
+                View All Listings
+            </a>
         </div>
     </div>
+</div>
+
     
     <!-- How It Works Section -->
     <div class="container mx-auto px-4 py-12">
